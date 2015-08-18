@@ -3,7 +3,7 @@
 [![PyPI Version](https://badge.fury.io/py/nessrest.svg)](https://pypi.python.org/pypi/nessrest)
 ### Dependencies:
 
-* Nessus 6.0.1
+* Nessus 6.4.x
 * Python 2.7+ or 3.3+
 * requests module (install via pip)
 * The dependencies can be satisfied via `pip install -r requirements.txt`

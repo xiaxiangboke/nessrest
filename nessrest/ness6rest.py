@@ -125,7 +125,7 @@ class Scanner(object):
                 sys.exit(0)
 
         self._get_permissions()
-        self._get_feed()
+        self._get_scanner_id()
 
 ################################################################################
     def _get_permissions(self):
@@ -136,6 +136,24 @@ class Scanner(object):
         self.action(action="session", method="get")
         self.permissions = self.res['permissions']
 
+################################################################################
+    def _get_scanner_id(self):
+        '''
+        Pull in information about scanner. The ID is necessary, everything else
+        is "nice to have" for debugging.
+        '''
+        self.action(action="scanners", method="get")
+
+        try:
+            for scanner in self.res["scanners"]:
+                    if scanner["type"] == "local":
+                        self.scanner_id = scanner['id']
+                        self.ver_plugins = scanner['loaded_plugin_set']
+                        self.ver_gui = scanner['ui_version']
+                        self.ver_svr = scanner['engine_version']
+                        self.ver_feed = scanner['license']['type']
+        except:
+            pass
 ################################################################################
     def action(self, action, method, extra={}, files={}, json_req=True, download=False, private=False, retry=True):
         '''
@@ -243,18 +261,6 @@ class Scanner(object):
             if template["name"] == name:
                 self.scan_template_uuid = template["uuid"]
                 break
-
-################################################################################
-    def _get_feed(self):
-        '''
-        This is primarily for debugging and reporting.
-        '''
-        # self.action(action="server/properties", method="get")
-        # self.ver_gui = self.res['nessus_ui_version']
-        # self.ver_svr = self.res['server_version']
-        # self.ver_feed = self.res['feed']
-        # self.ver_plugins = self.res['loaded_plugin_set']
-        pass
 
 ################################################################################
     def policy_add(self, name, plugins, credentials=[], template="advanced"):
@@ -591,6 +597,7 @@ class Scanner(object):
         settings.update({"filter_type": ""})
 
         # Dynamic items
+        settings.update({"scanner_id": str(self.scanner_id)})
         settings.update({"name": self.scan_name})
         settings.update({"policy_id": self.policy_id})
         settings.update({"folder_id": self.tag_id})
@@ -920,31 +927,34 @@ class Scanner(object):
                             "/trails/?plugin_id=" + str(plugin) + "&hostname=" +
                             host["hostname"], method="get")
 
-                # If there is audit trail, the self.res is 'null'
-                if self.res:
-                    for output in self.res:
-                        print("Plugin Name   : " +
-                              self.plugins[plugin]["name"])
-                        print("Plugin File   : " +
-                              self.plugins[plugin]["fname"])
-                        print("Plugin ID     : %s" % plugin)
-                        print("Audit trail   : " + output["output"])
-                        print()
+                # New syntax for 6.4
+                try:
+                    if self.res["trails"]:
+                        for output in self.res["trails"]:
+                            print("Plugin Name   : " + self.plugins[plugin]["name"])
+                            print("Plugin File   : " + self.plugins[plugin]["fname"])
+                            print("Plugin ID     : %s" % plugin)
+                            print("Audit trail   : " + output["output"])
+                            print()
+                except:
+                    pass
 
             if self.format_end:
                 print(self.format_end)
+        try:
+            if self.res is not None:
+                for host in self.res["comphosts"]:
+                    print("----------------------------------------")
+                    print("Target    : %s" % host["hostname"])
+                    print("----------------------------------------\n")
 
-        if self.res is not None:
-            for host in self.res["comphosts"]:
-                print("----------------------------------------")
-                print("Target    : %s" % host["hostname"])
-                print("----------------------------------------\n")
-
-                for plugin in self.res["compliance"]:
-                    self.action("scans/" + str(self.scan_id) + "/hosts/" +
-                                str(host["host_id"]) + "/compliance/" +
-                                str(plugin['plugin_id']), method="get")
-                    self.pretty_print()
+                    for plugin in self.res["compliance"]:
+                        self.action("scans/" + str(self.scan_id) + "/hosts/" +
+                                    str(host["host_id"]) + "/compliance/" +
+                                    str(plugin['plugin_id']), method="get")
+                        self.pretty_print()
+        except:
+            pass
 
 ################################################################################
     def upload(self, upload_file, file_contents=""):

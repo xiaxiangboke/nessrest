@@ -167,14 +167,30 @@ else:
     print("No config file found, exiting!")
     sys.exit(1)
 
-login = config.get('server', 'login')
-password = config.get('server', 'password')
+akey = None
+skey = None
+
+try:
+    akey = config.get('server', 'api_akey')
+    skey = config.get('server', 'api_skey')
+    login = None
+    password = None
+except:
+    pass
+
+if not akey and not skey:
+    login = config.get('server', 'login')
+    password = config.get('server', 'password')
+
 url = "https://%s:%s" % (config.get('server', 'host'),
                          config.get('server', 'port'))
 try:
-    scan = ness6rest.Scanner(url=url, login=login, password=password, insecure=args.insecure, ca_bundle=args.ca_bundle)
+    scan = ness6rest.Scanner(url=url, login=login, password=password,
+                             api_akey=akey, api_skey=skey,
+                             insecure=args.insecure, ca_bundle=args.ca_bundle)
 except ness6rest.SSLException as ex:
-    print("SSL Error: %s\nYou can use --insecure to disable SSL certificate checking, but use this with caution!\nExiting.\n" % ex)
+    print("SSL Error: %s\nYou can use --insecure to disable SSL certificate" +
+          "checking, but use this with caution!\nExiting.\n" % ex)
     sys.exit(1)
 except Exception as ex:
     print("Unexpected Error: %s" % ex)

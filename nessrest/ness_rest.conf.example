@@ -3,6 +3,8 @@ host = FQDN or IP address
 port = 8834
 login = user
 password = password
+api_akey =
+api_skey=
 
 # These are the Nessus defaults.
 [settings]

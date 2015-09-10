@@ -48,7 +48,11 @@ class Scanner(object):
     '''
     Scanner object
     '''
-    def __init__(self, url, login, password, insecure=False, ca_bundle=''):
+    def __init__(self, url, login='', password='', api_akey='', api_skey='',
+                 insecure=False, ca_bundle=''):
+        self.api_akey = None
+        self.api_skey = None
+        self.use_api = False
         self.name = ''
         self.policy_name = ''
         self.debug = False
@@ -89,20 +93,28 @@ class Scanner(object):
         self.ca_bundle = ca_bundle
         self.insecure = insecure
         self.auth = []
-
-        if insecure and hasattr(requests, 'packages'):
-            requests.packages.urllib3.disable_warnings()
-
         self.host_vulns = {}
         self.plugin_output = {}
         self.host_details = {}
         self.host_ids = {}
 
-        # Initial login to get our token for all subsequent transactions
-        self._login(login, password)
+        if insecure and hasattr(requests, 'packages'):
+            requests.packages.urllib3.disable_warnings()
 
-        # Register a call to the logout action automatically
-        atexit.register(self.action, action="session", method="delete", retry=False)
+        if (api_akey and api_skey):
+            self.api_akey = api_akey
+            self.api_skey = api_skey
+            self.use_api = True
+        else:
+            # Initial login to get our token for all subsequent transactions
+            self._login(login, password)
+
+            # Register a call to the logout action automatically
+            atexit.register(self.action, action="session",
+                            method="delete", retry=False)
+
+        self._get_permissions()
+        self._get_scanner_id()
 
 ################################################################################
     def _login(self, login="", password=""):
@@ -123,9 +135,6 @@ class Scanner(object):
                 print("It looks like you're trying to login into a Nessus 5")
                 print("instance. Exiting.")
                 sys.exit(0)
-
-        self._get_permissions()
-        self._get_scanner_id()
 
 ################################################################################
     def _get_permissions(self):
@@ -163,7 +172,11 @@ class Scanner(object):
         '''
         payload = {}
         payload.update(extra)
-        headers = {'X-Cookie': 'token=' + str(self.token)}
+        if self.use_api:
+            headers = {'X-ApiKeys': 'accessKey=' + self.api_akey +
+                       '; secretKey=' + self.api_skey}
+        else:
+            headers = {'X-Cookie': 'token=' + str(self.token)}
 
         if json_req:
             headers.update({'Content-type': 'application/json',

@@ -79,7 +79,7 @@ pip install nessrest
 * Find the path to your "site-packages" with: `python -c "import sys; print(sys.path)"`
 * Symlink `ness6rest.py` in the Git repo in the "site-packages" or "dist-packages" directory.
 * Test by issuing `import ness6rest` inside the Python interactive
-  interperter.
+  interpreter.
 
 ### Specifying a ca\_bundle
 
@@ -97,7 +97,7 @@ If you're running Nessus with a self-signed certificate, and you wish to disable
   scan = ness6rest.Scanner(url="https://nessusscanner:8834", login="username", password="password", insecure=True)
   ```
 
-If you're using the nessrest example client, it has a --insecure option that will do this.
+If you're using the nessrest example client, it has an --insecure option that will do this.
 
 Note that this will disable invalid SSL cerficate errors and should be used with caution.
 

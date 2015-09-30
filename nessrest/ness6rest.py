@@ -704,7 +704,7 @@ class Scanner(object):
 
             for scan in self.res["scans"]:
                 if (scan["uuid"] == self.scan_uuid
-                        and scan['status'] == "running"):
+                        and (scan['status'] == "running" or scan['status'] == "pending")):
 
                     sys.stdout.write(".")
                     sys.stdout.flush()
@@ -715,7 +715,7 @@ class Scanner(object):
                         print("")
 
                 if (scan["uuid"] == self.scan_uuid
-                        and scan['status'] != "running"):
+                        and scan['status'] != "running" and scan['status'] != "pending"):
 
                     running = False
 

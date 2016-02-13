@@ -301,6 +301,29 @@ class Scanner(object):
         self._enable_plugins()
 
 ################################################################################
+    def policy_copy(self, existing_policy_name, new_policy_name):
+        '''
+        Create a copy of an existing policy and set it to be used for a scan
+        '''
+        self.action(action="policies", method="get")
+
+        for policy in self.res["policies"]:
+            if policy["name"] == existing_policy_name:
+                self.action(action="policies/" + str(policy["id"]) + "/copy", method="post")
+                self.policy_id = self.res["id"]
+
+                '''
+                If there is a name conflict the rename appends a
+                number to the requested name.
+                '''
+                self.policy_name = new_policy_name
+                self.action(action="policies/" + str(self.policy_id), method="put",
+                        extra={"settings":{"name": self.policy_name}})
+                return True
+
+        return False
+
+################################################################################
     def policy_exists(self, name):
         '''
         Set existing policy to use for a scan.

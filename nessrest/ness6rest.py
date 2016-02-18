@@ -520,7 +520,7 @@ class Scanner(object):
         for plugin in plugins.split(','):
             self.action(action="plugins/plugin/" + str(plugin), method="GET")
 
-            if self.res:
+            if "attributes" in self.res:
                 for attrib in self.res["attributes"]:
                     if attrib["attribute_name"] == "fname":
                         self.plugins.update({str(plugin):

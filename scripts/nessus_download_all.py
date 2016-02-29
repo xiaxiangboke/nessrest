@@ -81,8 +81,12 @@ if scanner:
   scans = scanner.res['scans']
   # create scan subfolders
   for f in folders:
-    if not os.path.exists(f['name']) and not (f['type'] == 'trash' and args.trash):
-      os.mkdir(f['name'])
+    if not os.path.exists(f['name']):
+      if f['type'] == 'trash':
+        if args.trash:
+          os.mkdir(f['name'])
+      else:
+        os.mkdir(f['name'])
   # try download and save scans into each folder the belong to
   for s in scans:
     scanner.scan_name = s['name']

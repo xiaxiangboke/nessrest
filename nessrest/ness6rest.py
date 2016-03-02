@@ -626,7 +626,6 @@ class Scanner(object):
         # Static items- some could be dynamic, but it's overkill
         settings.update({"launch": "ON_DEMAND"})
         settings.update({"description": "Created with REST API"})
-        settings.update({"scanner_id": "1"})
         settings.update({"file_targets": ""})
         settings.update({"filters": []})
         settings.update({"emails": ""})

@@ -835,7 +835,7 @@ class Scanner(object):
         # Get details of requested scan
 
         self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id), method="get")
-        if host_id not in self.host_details:
+        if scan_id not in self.host_details:
             self.host_details[scan_id] = {}
         self.host_details[scan_id][host_id]=self.res
 

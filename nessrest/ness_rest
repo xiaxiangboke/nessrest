@@ -29,7 +29,8 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function
-from nessrest import ness6rest, credentials
+import ness6rest
+import credentials
 import argparse
 import os
 import sys

@@ -2,3 +2,5 @@
 ness_rest.conf
 __pycache__
 MANIFEST
+.project
+.pydevproject

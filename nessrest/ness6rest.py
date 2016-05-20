@@ -399,6 +399,15 @@ class Scanner(object):
         self.action(action="policies/" + str(self.policy_id), method="put",
                     extra=extra)
 
+###############################################################################
+    def policy_limit_ports(self, ports):
+        '''
+        Limit the ports scanned to the given list.
+        '''
+        extra = {"settings": {"portscan_range": str(ports)}}
+        self.action(action="policies/" + str(self.policy_id), method="put",
+            extra=extra)
+
 ################################################################################
     def policy_add_creds(self, credentials, policy_id=""):
         '''

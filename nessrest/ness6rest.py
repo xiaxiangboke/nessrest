@@ -208,7 +208,7 @@ class Scanner(object):
 
         try:
             req = requests.request(method, url, data=payload, files=files,
-                                   verify=verify, headers=headers)
+                                   verify=verify, headers=headers, stream=True)
 
             if not download and req.text:
                 self.res = req.json()
@@ -239,7 +239,7 @@ class Scanner(object):
                 print("RESPONSE CODE: %d" % req.status_code)
 
             if download:
-                return req.text
+                return req.content
         except requests.exceptions.SSLError as ssl_error:
             raise SSLException('%s for %s.' % (ssl_error, url))
         except requests.exceptions.ConnectionError:
@@ -299,29 +299,6 @@ class Scanner(object):
         self._policy_set_settings()
         self.plugins_info(plugins=plugins)
         self._enable_plugins()
-
-################################################################################
-    def policy_copy(self, existing_policy_name, new_policy_name):
-        '''
-        Create a copy of an existing policy and set it to be used for a scan
-        '''
-        self.action(action="policies", method="get")
-
-        for policy in self.res["policies"]:
-            if policy["name"] == existing_policy_name:
-                self.action(action="policies/" + str(policy["id"]) + "/copy", method="post")
-                self.policy_id = self.res["id"]
-
-                '''
-                If there is a name conflict the rename appends a
-                number to the requested name.
-                '''
-                self.policy_name = new_policy_name
-                self.action(action="policies/" + str(self.policy_id), method="put",
-                        extra={"settings":{"name": self.policy_name}})
-                return True
-
-        return False
 
 ################################################################################
     def policy_exists(self, name):
@@ -398,15 +375,6 @@ class Scanner(object):
         extra = {"settings": {"portscan_range": new_ports}}
         self.action(action="policies/" + str(self.policy_id), method="put",
                     extra=extra)
-
-###############################################################################
-    def policy_limit_ports(self, ports):
-        '''
-        Limit the ports scanned to the given list.
-        '''
-        extra = {"settings": {"portscan_range": str(ports)}}
-        self.action(action="policies/" + str(self.policy_id), method="put",
-            extra=extra)
 
 ################################################################################
     def policy_add_creds(self, credentials, policy_id=""):
@@ -529,7 +497,7 @@ class Scanner(object):
         for plugin in plugins.split(','):
             self.action(action="plugins/plugin/" + str(plugin), method="GET")
 
-            if "attributes" in self.res:
+            if self.res:
                 for attrib in self.res["attributes"]:
                     if attrib["attribute_name"] == "fname":
                         self.plugins.update({str(plugin):
@@ -635,6 +603,7 @@ class Scanner(object):
         # Static items- some could be dynamic, but it's overkill
         settings.update({"launch": "ON_DEMAND"})
         settings.update({"description": "Created with REST API"})
+        settings.update({"scanner_id": "1"})
         settings.update({"file_targets": ""})
         settings.update({"filters": []})
         settings.update({"emails": ""})
@@ -735,7 +704,7 @@ class Scanner(object):
 
             for scan in self.res["scans"]:
                 if (scan["uuid"] == self.scan_uuid
-                        and (scan['status'] == "running" or scan['status'] == "pending")):
+                        and scan['status'] == "running"):
 
                     sys.stdout.write(".")
                     sys.stdout.flush()
@@ -746,7 +715,7 @@ class Scanner(object):
                         print("")
 
                 if (scan["uuid"] == self.scan_uuid
-                        and scan['status'] != "running" and scan['status'] != "pending"):
+                        and scan['status'] != "running"):
 
                     running = False
 
@@ -843,7 +812,7 @@ class Scanner(object):
         # Get details of requested scan
 
         self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id), method="get")
-        if scan_id not in self.host_details:
+        if host_id not in self.host_details:
             self.host_details[scan_id] = {}
         self.host_details[scan_id][host_id]=self.res
 
@@ -896,7 +865,10 @@ class Scanner(object):
         counter = 0
 
         self.action("scans/" + str(self.scan_id), method="get")
-        data = {'format': export_format}
+        if (export_format=="db"):
+            data = {"format":"db","password":"test"}
+        elif (export_format=="nessus"):
+            data = {'format': export_format}
         self.action("scans/" + str(self.scan_id) + "/export",
                                         method="post",
                                         extra=data)
@@ -918,7 +890,7 @@ class Scanner(object):
         print("")
 
         content = self.action("scans/" + str(self.scan_id) + "/export/"
-                              + str(file_id) + "/download",
+                              + str(file_id) + "/download?token=" + str(self.token),
                               method="get",
                               download=True)
         return content

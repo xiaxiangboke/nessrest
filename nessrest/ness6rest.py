@@ -891,13 +891,13 @@ class Scanner(object):
         return kbs
 
 ################################################################################
-    def download_scan(self, export_format="nessus"):
+    def download_scan(self, export_format="nessus", dbpasswd=""):
         running = True
         counter = 0
 
         self.action("scans/" + str(self.scan_id), method="get")
         if (export_format=="db"):
-            data = {"format":"db","password":"test"}
+            data = {"format":"db","password":dbpasswd}
         else:
             data = {'format': export_format}
         self.action("scans/" + str(self.scan_id) + "/export",

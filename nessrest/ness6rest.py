@@ -239,7 +239,7 @@ class Scanner(object):
                 print("RESPONSE CODE: %d" % req.status_code)
 
             if download:
-                return req.text
+                return req.content
         except requests.exceptions.SSLError as ssl_error:
             raise SSLException('%s for %s.' % (ssl_error, url))
         except requests.exceptions.ConnectionError:
@@ -891,12 +891,15 @@ class Scanner(object):
         return kbs
 
 ################################################################################
-    def download_scan(self, export_format="nessus"):
+    def download_scan(self, export_format="nessus", dbpasswd=""):
         running = True
         counter = 0
 
         self.action("scans/" + str(self.scan_id), method="get")
-        data = {'format': export_format}
+        if (export_format=="db"):
+            data = {"format":"db","password":dbpasswd}
+        else:
+            data = {'format': export_format}
         self.action("scans/" + str(self.scan_id) + "/export",
                                         method="post",
                                         extra=data)

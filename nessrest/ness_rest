@@ -140,6 +140,12 @@ parser.add_argument("--insecure", action="store_true",
 parser.add_argument("--ca_bundle", default="",
                     help="path to a ca_bundle used to verify SSL certificates")
 
+parser.add_argument("--receive_timeout", default="",
+                    help="how long should we wait for a host to respond")
+
+parser.add_argument("--max_checks", default="",
+                    help="number of concurrent checks running against a host")
+
 args = parser.parse_args()
 
 if not args.plugins:
@@ -244,6 +250,10 @@ if args.verbose:
     scan.pref_verbose = "Verbose"
 if args.silent_deps:
     scan.pref_silent_dependencies = "yes"
+if args.max_checks:
+    scan.pref_max_checks = str(args.max_checks)
+if args.receive_timeout:
+    scan.pref_receive_timeout = str(args.receive_timeout)
 
 if args.format:
     scan.format = True

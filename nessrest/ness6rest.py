@@ -71,6 +71,8 @@ class Scanner(object):
         self.pref_paranoid = ''
         self.pref_supplied = ''
         self.pref_thorough = ''
+        self.pref_max_checks = ''
+        self.pref_receive_timeout = ''
         self.set_safe_checks = ''
         self.pref_verbose = ''
         self.pref_silent_dependencies = ''
@@ -470,6 +472,18 @@ class Scanner(object):
         if not self.pref_silent_dependencies:
             self.pref_silent_dependencies = "yes"
 
+        # Plugin receive timeout limit
+        # Values: positive integers, passed as strings
+        # Nessus default: 5
+        if not self.pref_receive_timeout:
+            self.pref_receive_timeout = "5"
+
+        # Maximum concurrent checks
+        # Values: positive integers, passed as strings
+        # Nessus default: 5
+        if not self.pref_max_checks:
+            self.pref_max_checks = "5"
+
         settings["settings"].update({"safe_checks": self.set_safe_checks})
         settings["settings"].update({"scan_webapps": self.pref_cgi})
         settings["settings"].update({"report_paranoia": self.pref_paranoid})
@@ -480,6 +494,10 @@ class Scanner(object):
                                      self.pref_silent_dependencies})
         settings["settings"].update({"cisco_offline_configs":
                                      self.cisco_offline_configs})
+        settings["settings"].update({"network_receive_timeout":
+                                     self.pref_receive_timeout})
+        settings["settings"].update({"max_checks_per_host":
+                                     self.pref_max_checks})
 
         self.action(action="policies/" + str(self.policy_id), method="put",
                     extra=settings)

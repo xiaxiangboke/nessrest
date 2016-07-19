@@ -20,7 +20,8 @@ def print_err(str_error, fatal=False):
 parser = argparse.ArgumentParser(description='Download completed nessus scans.')
 parser.add_argument('-s', '--server', help='IP address of Nessus API endpoint', default='127.0.0.1')
 parser.add_argument('-p', '--port', help='port number of Nessus API endpoint', type=int, default=8834)
-parser.add_argument('-f', '--format', help='report format', choices=['nessus', 'html', 'csv'], default='nessus')
+parser.add_argument('-f', '--format', help='report format', choices=['nessus', 'html', 'csv', 'db'], default='nessus')
+parser.add_argument('--dbpasswd', help='scan db format password', default=None)
 parser.add_argument('-c', '--capath', help='certificate authority path', default=None)
 parser.add_argument('-t', '--trash', help='include trash folder', action='store_true', default=False)
 parser.add_argument('--insecure', help='boldly go forth and ignore cert errors', action='store_true', default=False)
@@ -53,6 +54,9 @@ else:
 
 if args.capath and not os.path.isdir(args.capath):
   print_err('CA path "' + args.capath + '" not found.', True)
+
+if args.format == "db" and args.dbpasswd is None:
+  print_err('Format is db but no exported db password was specified, use --dbpasswd to specify', True)
 
 nessus_url = "https://" + args.server + ":" + str(args.port)
 insecure = args.insecure
@@ -105,8 +109,15 @@ if scanner:
       # PDF not yet supported
       # python API wrapper nessrest returns the PDF as a string object instead of a byte object, making writing and correctly encoding the file a chore...
       # other formats can be written out in text mode
-      with io.open(relative_path_name,'wt') as fp:
-        fp.write(scanner.download_scan(export_format=args.format))
+      file_modes = 'wt'
+      # DB is binary mode
+      if args.format == "db":
+        file_modes = 'wb'
+      with io.open(relative_path_name, file_modes) as fp:
+        if args.format != "db":
+          fp.write(scanner.download_scan(export_format=args.format))
+        else:
+          fp.write(scanner.download_scan(export_format=args.format, dbpasswd=args.dbpasswd))
 
 else:
   print_err('Failed to use scanner at ' + nessus_url + '.', True)

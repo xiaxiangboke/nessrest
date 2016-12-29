@@ -822,6 +822,14 @@ class Scanner(object):
         self.action(action="scans/" + str(self.scan_id), method="GET")
 
 ################################################################################
+    def scan_list(self):
+        '''
+        Fetch a list with scans
+        '''
+        self.action(action="scans", method="GET")
+        return self.res
+
+################################################################################
     def get_host_vulns(self, name):
         '''
         Fill in host_vulns dict with the host vulnerabilities found in a

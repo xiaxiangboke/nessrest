@@ -65,19 +65,19 @@ class Scan(object):
 
         if self.scan_id:
             self.scanner.action(action="scans/"+str(self.scan_id),
-                                method="put",
+                                method="PUT",
                                 extra=extra)
             if "error" in self.scanner.res:
                 self._error(self.scanner.res["error"])
             self.scanner.action(action="scans/"+str(self.scan_id)+
                                 "/launch",
-                                method="post")
+                                method="POST")
             if "error" in self.scanner.res:
                 self._error(self.scanner.res["error"])
             self.get_scan_settings(self.scan_id)
         else:
             self.scanner.action(action="scans",
-                                method="post",
+                                method="POST",
                                 extra=extra)
             if "error" in self.scanner.res:
                 self._error(self.scanner.res["error"])
@@ -96,7 +96,7 @@ class Scan(object):
         if scan_id:
             self.scan_id = scan_id
         self.scanner.action("scans/"+str(self.scan_id),
-                            method="get")
+                            method="GET")
         if "info" in self.scanner.res:
             self.info = self.scanner.res["info"]
 
@@ -104,12 +104,12 @@ class Scan(object):
         if scan_id:
             self.scan_id = scan_id
         self.scanner.action(action="editor/scan/"+str(scan_id),
-                            method="get")
+                            method="GET")
         self._cache["scan"] = self.scanner.res
         self.uuid = self._cache["scan"]["uuid"]
 
     def set_scan_template(self,name):
-        self.scanner.action(action="editor/scan/templates", method="get")
+        self.scanner.action(action="editor/scan/templates", method="GET")
         for template in self.scanner.res["templates"]:
             for key in template:
                 if template[key] == name:
@@ -117,13 +117,13 @@ class Scan(object):
         if self.uuid:
             self.scanner.action(action="editor/scan/templates/"+
                                 self.uuid,
-                                method="get")
+                                method="GET")
             self.settings.update(self._find_inputs(self.scanner.res))
             self._cache["template"] = self.scanner.res
 
     def get_scan_template_names(self):
         results = {}
-        self.scanner.action(action="editor/scan/templates", method="get")
+        self.scanner.action(action="editor/scan/templates", method="GET")
         for template in self.scan.res["templates"]:
             results[template["name"]] = template["title"]
         return results
@@ -223,7 +223,7 @@ class Scan(object):
 
     def set_folder(self,name):
         # Find folder by name
-        self.scanner.action(action="folders", method="get")
+        self.scanner.action(action="folders", method="GET")
         for folder in self.scanner.res["folders"]:
             if folder["name"] == name:
                 self.folder_id = folder["id"]
@@ -232,30 +232,30 @@ class Scan(object):
         # Create if does not exist
         if not self.folder_id:
             self.scanner.action("folders",
-                                method="post",
+                                method="POST",
                                 extra={"name": name})
             self.folder_id = self.scanner.res["id"]
 
     def download_scan(self,filename,export_format="nessus"):
         self.scanner.action("scans/"+str(self.scan_id),
-                            method="get")
+                            method="GET")
         extra = {"format": export_format}
         self.scanner.action("scans/"+str(self.scan_id)+"/export",
-                            method="post",
+                            method="POST",
                             extra=extra)
         file_id = self.scanner.res["file"]
         while self._export_in_progress(file_id):
             time.sleep(2)
 
         dl_url = "scans/"+str(self.scan_id)+"/export/"+str(file_id)+"/download"
-        content = self.scanner.action(dl_url, method="get", download=True)
+        content = self.scanner.action(dl_url, method="GET", download=True)
         with open(filename,"w") as out_file:
             out_file.write(content)
 
 
     def _export_in_progress(self,file_id):
         url = "scans/"+str(self.scan_id)+"/export/"+str(file_id)+"/status"
-        self.scanner.action(url,method="get")
+        self.scanner.action(url,method="GET")
         return self.scanner.res["status"] != "ready"
 
     def _find_inputs(self,obj):

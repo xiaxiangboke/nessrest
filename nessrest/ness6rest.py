@@ -113,7 +113,7 @@ class Scanner(object):
 
             # Register a call to the logout action automatically
             atexit.register(self.action, action="session",
-                            method="delete", retry=False)
+                            method="DELETE", retry=False)
 
         self._get_permissions()
         self._get_scanner_id()
@@ -124,7 +124,7 @@ class Scanner(object):
             self.auth = [login,password]
 
         self.action(action="session",
-                    method="post",
+                    method="POST",
                     extra={"username": self.auth[0], "password": self.auth[1]},
                     private=True,
                     retry=False)
@@ -144,7 +144,7 @@ class Scanner(object):
         All development has been conducted using and administrator account which
         had the permissions '128'
         '''
-        self.action(action="session", method="get")
+        self.action(action="session", method="GET")
         self.permissions = self.res['permissions']
 
 ################################################################################
@@ -153,7 +153,7 @@ class Scanner(object):
         Pull in information about scanner. The ID is necessary, everything else
         is "nice to have" for debugging.
         '''
-        self.action(action="scanners", method="get")
+        self.action(action="scanners", method="GET")
 
         try:
             for scanner in self.res["scanners"]:
@@ -260,7 +260,7 @@ class Scanner(object):
         '''
         Get the template ID. This provides the default settings for the policy.
         '''
-        self.action(action="editor/policy/templates", method="get")
+        self.action(action="editor/policy/templates", method="GET")
         for template in self.res["templates"]:
             if template["name"] == name:
                 self.policy_template_uuid = template["uuid"]
@@ -271,7 +271,7 @@ class Scanner(object):
         '''
         Get the template ID. This provides the default settings for the policy.
         '''
-        self.action(action="editor/scan/templates", method="get")
+        self.action(action="editor/scan/templates", method="GET")
         for template in self.res["templates"]:
             if template["name"] == name:
                 self.scan_template_uuid = template["uuid"]
@@ -307,11 +307,11 @@ class Scanner(object):
         '''
         Create a copy of an existing policy and set it to be used for a scan
         '''
-        self.action(action="policies", method="get")
+        self.action(action="policies", method="GET")
 
         for policy in self.res["policies"]:
             if policy["name"] == existing_policy_name:
-                self.action(action="policies/" + str(policy["id"]) + "/copy", method="post")
+                self.action(action="policies/" + str(policy["id"]) + "/copy", method="POST")
                 self.policy_id = self.res["id"]
 
                 '''
@@ -319,7 +319,7 @@ class Scanner(object):
                 number to the requested name.
                 '''
                 self.policy_name = new_policy_name
-                self.action(action="policies/" + str(self.policy_id), method="put",
+                self.action(action="policies/" + str(self.policy_id), method="PUT",
                         extra={"settings":{"name": self.policy_name}})
                 return True
 
@@ -331,7 +331,7 @@ class Scanner(object):
         Set existing policy to use for a scan.
         '''
         self.policy_name = name
-        self.action(action="policies", method="get")
+        self.action(action="policies", method="GET")
 
         for policy in self.res["policies"]:
             if policy["name"] == name:
@@ -346,7 +346,7 @@ class Scanner(object):
         Set existing policy to use for a scan.
         '''
         self.policy_name = name
-        self.action(action="policies", method="get")
+        self.action(action="policies", method="GET")
 
         for policy in self.res["policies"]:
             if policy["name"] == name:
@@ -363,7 +363,7 @@ class Scanner(object):
         Retrieves details of an existing policy.
         '''
         self.policy_id = policy_id
-        self.action(action="policies/" + str(self.policy_id), method="get")
+        self.action(action="policies/" + str(self.policy_id), method="GET")
         return self.res
 
 ################################################################################
@@ -373,7 +373,7 @@ class Scanner(object):
         This is easier than attempting to design an entire policy in one call.
         '''
         extra = {"settings": {"name": self.policy_name}, "uuid": uuid}
-        self.action(action="policies", method="post", extra=extra)
+        self.action(action="policies", method="POST", extra=extra)
 
 ################################################################################
     def policy_add_ports(self, ports):
@@ -386,7 +386,7 @@ class Scanner(object):
         discovery = {}
         default_ports = ""
 
-        self.action(action="editor/policy/" + str(self.policy_id), method="get")
+        self.action(action="editor/policy/" + str(self.policy_id), method="GET")
         for inputs in self.res["settings"]["discovery"]["groups"]:
             if inputs["name"] == "network_discovery":
                 discovery = inputs["sections"]
@@ -398,7 +398,7 @@ class Scanner(object):
 
         new_ports = str(default_ports) + "," + str(ports)
         extra = {"settings": {"portscan_range": new_ports}}
-        self.action(action="policies/" + str(self.policy_id), method="put",
+        self.action(action="policies/" + str(self.policy_id), method="PUT",
                     extra=extra)
 
 ###############################################################################
@@ -407,7 +407,7 @@ class Scanner(object):
         Limit the ports scanned to the given list.
         '''
         extra = {"settings": {"portscan_range": str(ports)}}
-        self.action(action="policies/" + str(self.policy_id), method="put",
+        self.action(action="policies/" + str(self.policy_id), method="PUT",
             extra=extra)
 
 ################################################################################
@@ -426,7 +426,7 @@ class Scanner(object):
 
         creds = {"credentials": {"add": creds}}
         self.action(action="policies/" + str(policy_id),
-                    method="put", extra=creds)
+                    method="PUT", extra=creds)
 
 ################################################################################
     def _policy_set_settings(self):
@@ -499,7 +499,7 @@ class Scanner(object):
         settings["settings"].update({"max_checks_per_host":
                                      self.pref_max_checks})
 
-        self.action(action="policies/" + str(self.policy_id), method="put",
+        self.action(action="policies/" + str(self.policy_id), method="PUT",
                     extra=settings)
 
 ################################################################################
@@ -510,7 +510,7 @@ class Scanner(object):
         delete_ids = []
 
         self.action(action="editor/policy/" + str(self.policy_id),
-                    method="get")
+                    method="GET")
 
         for record in self.res['compliance']['data']:
             if record['name'] == category:
@@ -523,7 +523,7 @@ class Scanner(object):
             audit["audits"]["custom"]["delete"] = delete_ids
 
             self.action(action="policies/" + str(self.policy_id),
-                        method="put", extra=audit)
+                        method="PUT", extra=audit)
 
 ################################################################################
     def _policy_add_audit(self, category, filename):
@@ -536,7 +536,7 @@ class Scanner(object):
              "category": category})
 
         self.action(action="policies/" + str(self.policy_id),
-                    method="put", extra=audit)
+                    method="PUT", extra=audit)
 
 ################################################################################
     def plugins_info(self, plugins):
@@ -571,7 +571,7 @@ class Scanner(object):
         updates = {}
         family_id = {}
 
-        self.action(action="editor/policy/" + str(self.policy_id), method="get")
+        self.action(action="editor/policy/" + str(self.policy_id), method="GET")
 
         # Build an object to disable all plugins at the family level.
         for item in self.res["plugins"]["families"]:
@@ -579,7 +579,7 @@ class Scanner(object):
 
         # print(json.dumps(families, sort_keys=False, indent=4))
         self.action(action="policies/" + str(self.policy_id),
-                    method="put", extra=families)
+                    method="PUT", extra=families)
 
         # Query the search interface to get the family information for the
         # plugin
@@ -587,7 +587,7 @@ class Scanner(object):
             self.action(action="editor/policy/" + str(self.policy_id) +
                         "/families?filter.search_type=and&" +
                         "filter.0.filter=plugin_id&filter.0.quality=eq&" +
-                        "filter.0.value=" + str(plugin), method="get")
+                        "filter.0.value=" + str(plugin), method="GET")
 
             for family in self.res["families"]:
                 # if family not in updates:
@@ -607,7 +607,7 @@ class Scanner(object):
             families["plugins"][fam].update({"status": "mixed"})
             families["plugins"][fam].update({"individual": {}})
             self.action(action="editor/policy/" + str(self.policy_id) +
-                        "/families/" + str(fam_id), method="get")
+                        "/families/" + str(fam_id), method="GET")
 
             # Disable every plugin in the family
             all_disabled = {}
@@ -625,7 +625,7 @@ class Scanner(object):
                                                                "enabled"})
 
         self.action(action="policies/" + str(self.policy_id),
-                    method="put", extra=families)
+                    method="PUT", extra=families)
 
 ################################################################################
     def scan_add(self, targets, template="custom", name=""):
@@ -667,7 +667,7 @@ class Scanner(object):
 
         scan.update({"settings": settings})
 
-        self.action(action="scans", method="post", extra=scan)
+        self.action(action="scans", method="POST", extra=scan)
 
         # This is the scan template UUID, this will be overwritten when we run
         # the actual scan. Storing this value is mainly for debugging. If
@@ -685,7 +685,7 @@ class Scanner(object):
         Set existing scan.
         '''
         self.scan_name = name
-        self.action(action="scans", method="get")
+        self.action(action="scans", method="GET")
 
         if "scans" in self.res and self.res["scans"]:
             for scan in self.res["scans"]:
@@ -707,7 +707,7 @@ class Scanner(object):
 
         self.targets = targets.replace(",", " ")
 
-        self.action(action="scans/" + str(self.scan_id), method="get")
+        self.action(action="scans/" + str(self.scan_id), method="GET")
 
         #scan = {"uuid": self.scan_uuid}
         scan = {}
@@ -723,7 +723,7 @@ class Scanner(object):
 
         scan.update({"settings": settings})
 
-        self.action(action="scans/" + str(self.scan_id), method="put", extra=scan)
+        self.action(action="scans/" + str(self.scan_id), method="PUT", extra=scan)
 
 
 ################################################################################
@@ -732,7 +732,7 @@ class Scanner(object):
         Start the scan and save the UUID to query the status
         '''
         self.action(action="scans/" + str(self.scan_id) + "/launch",
-                    method="post")
+                    method="POST")
 
         self.scan_uuid = self.res["scan_uuid"]
 
@@ -749,7 +749,7 @@ class Scanner(object):
 
         while running:
             self.action(action="scans?folder_id=" + str(self.tag_id),
-                        method="get")
+                        method="GET")
 
             for scan in self.res["scans"]:
                 if (scan["uuid"] == self.scan_uuid
@@ -785,7 +785,7 @@ class Scanner(object):
         if not self.tag_name:
             self.tag_name = name
 
-        self.action(action="folders", method="get")
+        self.action(action="folders", method="GET")
 
         # Get the numeric ID of the tag. This is used to tag where the scan will
         # live in the GUI, as well as help filter the "scan_status" queries and
@@ -797,7 +797,7 @@ class Scanner(object):
 
         # Create the new tag if it doesn't exist
         if not self.tag_id:
-            self.action("folders", method="post", extra={"name": self.tag_name})
+            self.action("folders", method="POST", extra={"name": self.tag_name})
             self.tag_id = self.res["id"]
 
 ################################################################################
@@ -807,7 +807,7 @@ class Scanner(object):
         '''
 
         # Find the scan id based on the name
-        self.action(action="scans", method="get")
+        self.action(action="scans", method="GET")
 
         for scan in self.res["scans"]:
             if scan["name"] == name:
@@ -819,7 +819,15 @@ class Scanner(object):
             sys.exit(1)
 
         # Get the details of the scan
-        self.action(action="scans/" + str(self.scan_id), method="get")
+        self.action(action="scans/" + str(self.scan_id), method="GET")
+
+################################################################################
+    def scan_list(self):
+        '''
+        Fetch a list with scans
+        '''
+        self.action(action="scans", method="GET")
+        return self.res
 
 ################################################################################
     def get_host_vulns(self, name):
@@ -832,7 +840,7 @@ class Scanner(object):
         self.scan_details(name)
 
         for host in self.res["hosts"]:
-            self.action(action="scans/" + str(self.scan_id) + "/hosts/" + str(host["host_id"]), method="get")
+            self.action(action="scans/" + str(self.scan_id) + "/hosts/" + str(host["host_id"]), method="GET")
             #print("scans/" + str(self.scan_id)+ "/hosts/" +str(host["host_id"]))
             if self.scan_id not in self.host_vulns:
                 self.host_vulns[self.scan_id] = {}
@@ -860,7 +868,7 @@ class Scanner(object):
 
         # Get details of requested scan
 
-        self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id), method="get")
+        self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id), method="GET")
         if scan_id not in self.host_details:
             self.host_details[scan_id] = {}
         self.host_details[scan_id][host_id]=self.res
@@ -881,7 +889,7 @@ class Scanner(object):
            for host_id in self.host_vulns[scan_id]:
                for vulnerability in self.host_vulns[scan_id][host_id]["vulnerabilities"]:
                    if vulnerability["plugin_id"] == plugin_id:
-                       self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id) + "/plugins/" + str(plugin_id), method="get")
+                       self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id) + "/plugins/" + str(plugin_id), method="GET")
                        if scan_id not in self.plugin_output:
                            self.plugin_output[scan_id] = {}
                        self.plugin_output[scan_id][host_id]=self.res
@@ -892,7 +900,7 @@ class Scanner(object):
 
 ################################################################################
     def download_kbs(self):
-        self.action("scans/" + str(self.scan_id), method="get")
+        self.action("scans/" + str(self.scan_id), method="GET")
 
         # Merge vulnerability and compliance hosts into a list, unique by
         # hostname.
@@ -903,7 +911,7 @@ class Scanner(object):
             kbs[host["hostname"]] = self.action("scans/" + str(self.scan_id) +
                                                 "/hosts/" + str(host["host_id"]) +
                                                 "/kb?token=" + str(self.token),
-                                                method="get",
+                                                method="GET",
                                                 download=True)
 
         return kbs
@@ -913,13 +921,13 @@ class Scanner(object):
         running = True
         counter = 0
 
-        self.action("scans/" + str(self.scan_id), method="get")
+        self.action("scans/" + str(self.scan_id), method="GET")
         if (export_format=="db"):
             data = {"format":"db","password":dbpasswd}
         else:
             data = {'format': export_format}
         self.action("scans/" + str(self.scan_id) + "/export",
-                                        method="post",
+                                        method="POST",
                                         extra=data)
 
         file_id = self.res['file']
@@ -929,7 +937,7 @@ class Scanner(object):
             counter += 2
             self.action("scans/" + str(self.scan_id) + "/export/"
                                             + str(file_id) + "/status",
-                                            method="get")
+                                            method="GET")
             running = self.res['status'] != 'ready'
             sys.stdout.write(".")
             sys.stdout.flush()
@@ -940,7 +948,7 @@ class Scanner(object):
 
         content = self.action("scans/" + str(self.scan_id) + "/export/"
                               + str(file_id) + "/download",
-                              method="get",
+                              method="GET",
                               download=True)
         return content
 
@@ -954,7 +962,7 @@ class Scanner(object):
         self._scan_status()
 
         # Query the completed scan and parse results
-        self.action("scans/" + str(self.scan_id), method="get")
+        self.action("scans/" + str(self.scan_id), method="GET")
 
         for host in self.res["hosts"]:
             if self.format_start:
@@ -967,7 +975,7 @@ class Scanner(object):
             for plugin in self.plugins.keys():
                 self.action("scans/" + str(self.scan_id) + "/hosts/" +
                             str(host["host_id"]) + "/plugins/" + str(plugin),
-                            method="get")
+                            method="GET")
 
                 # If not defined, the plugin did not fire for the host
                 if self.res["outputs"]:
@@ -990,7 +998,7 @@ class Scanner(object):
                 # somewhat limited in utility.
                 self.action("scans/" + str(self.scan_id) +
                             "/trails/?plugin_id=" + str(plugin) + "&hostname=" +
-                            host["hostname"], method="get")
+                            host["hostname"], method="GET")
 
                 # New syntax for 6.4
                 try:
@@ -1016,7 +1024,7 @@ class Scanner(object):
                     for plugin in self.res["compliance"]:
                         self.action("scans/" + str(self.scan_id) + "/hosts/" +
                                     str(host["host_id"]) + "/compliance/" +
-                                    str(plugin['plugin_id']), method="get")
+                                    str(plugin['plugin_id']), method="GET")
                         self.pretty_print()
         except:
             pass
@@ -1036,7 +1044,7 @@ class Scanner(object):
                  'Filedata': file_contents}
 
         self.action(action="file/upload",
-                    method="post",
+                    method="POST",
                     files=files,
                     json_req=False)
 
@@ -1047,7 +1055,7 @@ class Scanner(object):
         '''
         data = {'file': filename}
         self.action(action="policies/import",
-                    method="post",
+                    method="POST",
                     extra=data)
         print("Imported policy named '%s', id %s" % (self.res['name'],
                                                      self.res['id']))

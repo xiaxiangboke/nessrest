@@ -60,5 +60,5 @@ setup(name="nessrest",
           "Programming Language :: Python :: 3",
       ],
       keywords="nessus nessrest ness_rest",
-      install_requires=['argparse >= 1.0', 'requests >= 1.4'],
+      install_requires=['requests >= 1.4'],
       scripts=['nessrest/ness_rest'])

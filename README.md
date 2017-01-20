@@ -71,9 +71,6 @@ pip install nessrest
 
 # nessrest - an example client
 
-### Dependencies:
-* argparse module (install via pip)
-
 ### Suggested installation:
 
 * Find the path to your "site-packages" with: `python -c "import sys; print(sys.path)"`

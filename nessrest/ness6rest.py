@@ -248,7 +248,7 @@ class Scanner(object):
             raise Exception("Could not connect to %s.\nExiting!\n" % url)
 
         if self.res and "error" in self.res and retry:
-            if self.res["error"] == "You need to log in to perform this request" or self.res["error"] == "Invalid credentials":
+            if self.res["error"] == "You need to log in to perform this request" or self.res["error"] == "Invalid Credentials":
                 self._login()
                 self.action(action=action, method=method, extra=extra, files=files,
                             json_req=json_req, download=download, private=private,

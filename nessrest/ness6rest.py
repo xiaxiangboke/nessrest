@@ -661,7 +661,10 @@ class Scanner(object):
         # Dynamic items
         settings.update({"scanner_id": str(self.scanner_id)})
         settings.update({"name": self.scan_name})
-        settings.update({"policy_id": self.policy_id})
+
+        if self.policy_id:
+            settings.update({"policy_id": self.policy_id})
+
         settings.update({"folder_id": self.tag_id})
         settings.update({"text_targets": text_targets})
 

@@ -41,6 +41,12 @@ pip install nessrest
   scan.scan_run()
   ```
 
+* Launch Scheduled scans
+  ```python
+  scan.scan_add(targets="192.168.0.1", start="YYYYMMDDTHHMMSS")
+  scan.scan_run()
+  ```
+
 * Parse scan results
 
   ```python

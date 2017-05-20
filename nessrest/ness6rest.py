@@ -628,7 +628,7 @@ class Scanner(object):
                     method="PUT", extra=families)
 
 ################################################################################
-    def scan_add(self, targets, template="custom", name=""):
+    def scan_add(self, targets, template="custom", name="", start=""):
         '''
         After building the policy, create a scan.
         '''
@@ -668,6 +668,10 @@ class Scanner(object):
         settings.update({"folder_id": self.tag_id})
         settings.update({"text_targets": text_targets})
 
+        # Start a scan at a scheduled time
+        if start:
+            settings.update({"starttime": start})
+            settings.update({"rrules": "FREQ=ONETIME"})
         scan.update({"settings": settings})
 
         self.action(action="scans", method="POST", extra=scan)

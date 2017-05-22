@@ -27,8 +27,8 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from nessrest import ness6rest as nessrest
-from . import  credentials
+import ness6rest as nessrest
+import credentials
 
 def test_deduplicate_hosts():
     login = os.getenv("NESSUS_USER")

@@ -28,7 +28,7 @@
 
 import os
 import nessrest.ness6rest as nessrest
-import nessrest.credentials
+import nessrest.credentials as credentials
 
 def test_deduplicate_hosts():
     login = os.getenv("NESSUS_USER")

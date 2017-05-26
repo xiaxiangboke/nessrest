@@ -3,9 +3,13 @@ python:
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
+  - "3.6"
+  - "pypy"
+  - "pypy3"
 install: pip install requests
 script:
-  - python ./nessrest/test_ness6rest.py
+#  - python ./nessrest/test_ness6rest.py
   - python setup.py sdist
   - python setup.py bdist_wheel
   - python setup.py test

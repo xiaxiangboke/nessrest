@@ -165,6 +165,7 @@ class Scanner(object):
                         self.ver_feed = scanner['license']['type']
         except:
             pass
+
 ################################################################################
     def action(self, action, method, extra={}, files={}, json_req=True, download=False, private=False, retry=True):
         '''
@@ -253,7 +254,6 @@ class Scanner(object):
                 self.action(action=action, method=method, extra=extra, files=files,
                             json_req=json_req, download=download, private=private,
                             retry=False)
-
 
 ################################################################################
     def _policy_template_uuid(self, name):

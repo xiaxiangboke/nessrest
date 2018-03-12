@@ -324,6 +324,20 @@ class Scanner(object):
                 return True
 
         return False
+        
+################################################################################
+    def policy_delete(self, name):
+        '''
+        Delete a policy.
+        '''
+        self.action(action="policies", method="GET")
+
+        for policy in self.res["policies"]:
+            if policy["name"] == name:
+                self.action(action="policies/" + str(policy["id"]), method="DELETE")
+                return True
+                
+        return False
 
 ################################################################################
     def policy_exists(self, name):

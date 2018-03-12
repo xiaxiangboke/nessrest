@@ -109,10 +109,10 @@ if scanner:
       # PDF not yet supported
       # python API wrapper nessrest returns the PDF as a string object instead of a byte object, making writing and correctly encoding the file a chore...
       # other formats can be written out in text mode
-      file_modes = 'wt'
+      file_modes = 'wb'
       # DB is binary mode
-      if args.format == "db":
-        file_modes = 'wb'
+      #if args.format == "db":
+      #  file_modes = 'wb'
       with io.open(relative_path_name, file_modes) as fp:
         if args.format != "db":
           fp.write(scanner.download_scan(export_format=args.format))

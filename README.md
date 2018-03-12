@@ -41,6 +41,11 @@ pip install nessrest
   scan.scan_run()
   ```
 
+* Schedule scans
+  ```python
+  scan.scan_add(targets="192.168.0.1", start="YYYYMMDDTHHMMSS")
+  ```
+
 * Parse scan results
 
   ```python
@@ -70,9 +75,6 @@ pip install nessrest
 * Proxies are not supported, although transparent proxies should work... transparently
 
 # nessrest - an example client
-
-### Dependencies:
-* argparse module (install via pip)
 
 ### Suggested installation:
 

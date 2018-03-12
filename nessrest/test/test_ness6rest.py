@@ -27,8 +27,8 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import ness6rest as nessrest
-import credentials
+import nessrest.ness6rest as nessrest
+import nessrest.credentials as credentials
 
 def test_deduplicate_hosts():
     login = os.getenv("NESSUS_USER")
@@ -36,7 +36,7 @@ def test_deduplicate_hosts():
     url = "https://%s:%s" % (os.getenv("NESSUS_SERVER"),
                              os.getenv("NESSUS_PORT", "8834"))
 
-    scan = nessrest.Scanner(url=url, login=login, password=password)
+    scan = nessrest.Scanner(url=url, login=login, password=password, insecure=True)
 
     hosts = [{'hostname': 'host1', 'host_id': '1'},
              {'hostname': 'host1', 'host_id': '1'},

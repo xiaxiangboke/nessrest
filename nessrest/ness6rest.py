@@ -165,6 +165,7 @@ class Scanner(object):
                         self.ver_feed = scanner['license']['type']
         except:
             pass
+
 ################################################################################
     def action(self, action, method, extra={}, files={}, json_req=True, download=False, private=False, retry=True):
         '''
@@ -253,7 +254,6 @@ class Scanner(object):
                 self.action(action=action, method=method, extra=extra, files=files,
                             json_req=json_req, download=download, private=private,
                             retry=False)
-
 
 ################################################################################
     def _policy_template_uuid(self, name):
@@ -918,13 +918,13 @@ class Scanner(object):
         self.get_host_vulns(scan)
 
         for scan_id in self.host_vulns:
-           for host_id in self.host_vulns[scan_id]:
-               for vulnerability in self.host_vulns[scan_id][host_id]["vulnerabilities"]:
-                   if vulnerability["plugin_id"] == plugin_id:
-                       self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id) + "/plugins/" + str(plugin_id), method="GET")
-                       if scan_id not in self.plugin_output:
-                           self.plugin_output[scan_id] = {}
-                       self.plugin_output[scan_id][host_id]=self.res
+            for host_id in self.host_vulns[scan_id]:
+                for vulnerability in self.host_vulns[scan_id][host_id]["vulnerabilities"]:
+                    if vulnerability["plugin_id"] == plugin_id:
+                        self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id) + "/plugins/" + str(plugin_id), method="GET")
+                        if scan_id not in self.plugin_output:
+                            self.plugin_output[scan_id] = {}
+                        self.plugin_output[scan_id][host_id]=self.res
 
 ################################################################################
     def _deduplicate_hosts(self, hosts):

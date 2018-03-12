@@ -146,7 +146,7 @@ class Scan(object):
     def get_compliance_categories(self):
         if self.categories:
             return self.categories
-        if not "template" in self._cache:
+        if "template" not in self._cache:
             self._error("Template must be set before categories.")
         for item in self._cache["template"]["compliance"]["data"]:
             self.categories[item["name"]] = None
@@ -172,7 +172,7 @@ class Scan(object):
         self.uploads.append(filename)
 
     def remove_all_audit_files(self):
-        if not "scan" in self._cache or not "compliance" in self._cache["scan"]:
+        if "scan" not in self._cache or "compliance" not in self._cache["scan"]:
             return
         self._verify_custom_audit_action("delete")
         for record in self._cache["scan"]["compliance"]["data"]:
@@ -200,7 +200,7 @@ class Scan(object):
         self.creds["add"][cred.category][cred.name].append(cred.__dict__)
 
     def remove_all_credentials(self):
-        if not "scan" in self._cache or not "credentials" in self._cache["scan"]:
+        if "scan" not in self._cache or "credentials" not in self._cache["scan"]:
             return
         self._verify_credential_action("delete")
         for record in self._cache["scan"]["credentials"]["data"]:

@@ -110,6 +110,7 @@ class PaloAltoPANOS(object):
         self.port = port
         self.verify_ssl = verify_ssl
 
+
 class RHEV(object):
     '''
     Username and password for a Red Hat Enterprise Virtualization

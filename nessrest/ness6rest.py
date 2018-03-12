@@ -851,6 +851,17 @@ class Scanner(object):
         return self.res
 
 ################################################################################
+    def scan_list_from_folder(self, folder_id):
+        '''
+        Fetch a list with scans from a specified folder
+        '''
+
+        # Find the scan id based on the name
+        self.action(action="scans/?folder_id=" + str(folder_id), method="GET")
+
+        return self.res
+
+################################################################################
     def get_host_vulns(self, name):
         '''
         Fill in host_vulns dict with the host vulnerabilities found in a

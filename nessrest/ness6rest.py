@@ -49,7 +49,7 @@ class Scanner(object):
     Scanner object
     '''
     def __init__(self, url, login='', password='', api_akey='', api_skey='',
-                 insecure=False, ca_bundle=''):
+                 insecure=False, ca_bundle='', auto_logout=True):
         self.api_akey = None
         self.api_skey = None
         self.use_api = False
@@ -112,8 +112,9 @@ class Scanner(object):
             self._login(login, password)
 
             # Register a call to the logout action automatically
-            atexit.register(self.action, action="session",
-                            method="DELETE", retry=False)
+            if auto_logout:
+                atexit.register(self.action, action="session",
+                            method="delete", retry=False)
 
         self._get_permissions()
         self._get_scanner_id()
@@ -137,6 +138,10 @@ class Scanner(object):
                 print("It looks like you're trying to login into a Nessus 5")
                 print("instance. Exiting.")
                 sys.exit(0)
+
+################################################################################
+    def logout(self):
+        self.action(action="session", method="delete", retry=False)
 
 ################################################################################
     def _get_permissions(self):

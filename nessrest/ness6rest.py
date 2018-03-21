@@ -49,7 +49,7 @@ class Scanner(object):
     Scanner object
     '''
     def __init__(self, url, login='', password='', api_akey='', api_skey='',
-                 insecure=False, ca_bundle=''):
+                 insecure=False, ca_bundle='', auto_logout=True):
         self.api_akey = None
         self.api_skey = None
         self.use_api = False
@@ -112,8 +112,9 @@ class Scanner(object):
             self._login(login, password)
 
             # Register a call to the logout action automatically
-            atexit.register(self.action, action="session",
-                            method="DELETE", retry=False)
+            if auto_logout:
+                atexit.register(self.action, action="session",
+                            method="delete", retry=False)
 
         self._get_permissions()
         self._get_scanner_id()
@@ -137,6 +138,10 @@ class Scanner(object):
                 print("It looks like you're trying to login into a Nessus 5")
                 print("instance. Exiting.")
                 sys.exit(0)
+
+################################################################################
+    def logout(self):
+        self.action(action="session", method="delete", retry=False)
 
 ################################################################################
     def _get_permissions(self):
@@ -165,6 +170,7 @@ class Scanner(object):
                         self.ver_feed = scanner['license']['type']
         except:
             pass
+
 ################################################################################
     def action(self, action, method, extra={}, files={}, json_req=True, download=False, private=False, retry=True):
         '''
@@ -254,7 +260,6 @@ class Scanner(object):
                             json_req=json_req, download=download, private=private,
                             retry=False)
 
-
 ################################################################################
     def _policy_template_uuid(self, name):
         '''
@@ -323,6 +328,20 @@ class Scanner(object):
                         extra={"settings":{"name": self.policy_name}})
                 return True
 
+        return False
+        
+################################################################################
+    def policy_delete(self, name):
+        '''
+        Delete a policy.
+        '''
+        self.action(action="policies", method="GET")
+
+        for policy in self.res["policies"]:
+            if policy["name"] == name:
+                self.action(action="policies/" + str(policy["id"]), method="DELETE")
+                return True
+                
         return False
 
 ################################################################################
@@ -837,6 +856,17 @@ class Scanner(object):
         return self.res
 
 ################################################################################
+    def scan_list_from_folder(self, folder_id):
+        '''
+        Fetch a list with scans from a specified folder
+        '''
+
+        # Find the scan id based on the name
+        self.action(action="scans/?folder_id=" + str(folder_id), method="GET")
+
+        return self.res
+
+################################################################################
     def get_host_vulns(self, name):
         '''
         Fill in host_vulns dict with the host vulnerabilities found in a
@@ -893,13 +923,13 @@ class Scanner(object):
         self.get_host_vulns(scan)
 
         for scan_id in self.host_vulns:
-           for host_id in self.host_vulns[scan_id]:
-               for vulnerability in self.host_vulns[scan_id][host_id]["vulnerabilities"]:
-                   if vulnerability["plugin_id"] == plugin_id:
-                       self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id) + "/plugins/" + str(plugin_id), method="GET")
-                       if scan_id not in self.plugin_output:
-                           self.plugin_output[scan_id] = {}
-                       self.plugin_output[scan_id][host_id]=self.res
+            for host_id in self.host_vulns[scan_id]:
+                for vulnerability in self.host_vulns[scan_id][host_id]["vulnerabilities"]:
+                    if vulnerability["plugin_id"] == plugin_id:
+                        self.action(action="scans/" + str(scan_id) + "/hosts/" + str(host_id) + "/plugins/" + str(plugin_id), method="GET")
+                        if scan_id not in self.plugin_output:
+                            self.plugin_output[scan_id] = {}
+                        self.plugin_output[scan_id][host_id]=self.res
 
 ################################################################################
     def _deduplicate_hosts(self, hosts):

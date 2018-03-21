@@ -706,6 +706,22 @@ class Scanner(object):
         self.scan_id = self.res["scan"]["id"]
 
 ################################################################################
+    def scan_delete(self, name):
+        '''
+        Delete a scan.
+        '''
+
+        # Find the scan id based on the name
+        self.action(action="scans", method="GET")
+
+        for scan in self.res["scans"]:
+            if scan["name"] == name:
+                self.action(action="scans/" + str(scan["id"]), method="DELETE")
+                return True
+
+        return False
+
+################################################################################
     def scan_exists(self, name):
         '''
         Set existing scan.

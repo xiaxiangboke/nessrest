@@ -67,7 +67,7 @@ pip install nessrest
 
 ### Feature Requests:
 
-* Deleting of scan/schedule/policy
+* Deleting of a schedule
 * Ability to change "tag" from CLI via config/CLI arg
 * Enforce supported versions of Nessus
 

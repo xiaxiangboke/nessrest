@@ -283,7 +283,7 @@ class Scanner(object):
                 break
 
 ################################################################################
-    def policy_add(self, name, plugins, credentials=[], template="advanced"):
+    def policy_add(self, name, plugins=None, credentials=[], template="advanced"):
         '''
         Add a policy and store the returned ID. The template defaults to
         "advanced" to remain compatible with the calls that occur in Nessus
@@ -304,8 +304,10 @@ class Scanner(object):
 
         self.policy_add_creds(credentials=credentials)
         self._policy_set_settings()
-        self.plugins_info(plugins=plugins)
-        self._enable_plugins()
+
+        if plugins != None:
+            self.plugins_info(plugins=plugins)
+            self._enable_plugins()
 
 ################################################################################
     def policy_copy(self, existing_policy_name, new_policy_name):

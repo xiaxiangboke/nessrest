@@ -301,10 +301,11 @@ class Scanner(object):
         except KeyError:
             print("policy_id was not returned. Exiting")
             sys.exit(1)
-        
+
+        self.policy_add_creds(credentials=credentials)
+        self._policy_set_settings()
+
         if plugins != None:
-            self.policy_add_creds(credentials=credentials)
-            self._policy_set_settings()
             self.plugins_info(plugins=plugins)
             self._enable_plugins()
 

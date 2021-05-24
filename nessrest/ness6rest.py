@@ -182,9 +182,11 @@ class Scanner(object):
         payload.update(extra)
         if self.use_api:
             headers = {'X-ApiKeys': 'accessKey=' + self.api_akey +
-                       '; secretKey=' + self.api_skey}
+                       '; secretKey=' + self.api_skey,
+                      'X-API-Token':'D7C59838-DE83-4E65-A00E-A1FB2D89B30F'}
         else:
-            headers = {'X-Cookie': 'token=' + str(self.token)}
+            headers = {'X-Cookie': 'token=' + str(self.token),
+                      'X-API-Token':'D7C59838-DE83-4E65-A00E-A1FB2D89B30F',}
 
         if json_req:
             headers.update({'Content-type': 'application/json',

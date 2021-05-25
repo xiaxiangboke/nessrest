@@ -183,10 +183,10 @@ class Scanner(object):
         if self.use_api:
             headers = {'X-ApiKeys': 'accessKey=' + self.api_akey +
                        '; secretKey=' + self.api_skey,
-                      'X-API-Token':'D7C59838-DE83-4E65-A00E-A1FB2D89B30F'}
+                      'X-API-Token':'cefc768a-8dcc-40bc-8f8f-5ad9bc3a97e9'}
         else:
             headers = {'X-Cookie': 'token=' + str(self.token),
-                      'X-API-Token':'D7C59838-DE83-4E65-A00E-A1FB2D89B30F'}
+                      'X-API-Token':'cefc768a-8dcc-40bc-8f8f-5ad9bc3a97e9'}
 
         if json_req:
             headers.update({'Content-type': 'application/json',
